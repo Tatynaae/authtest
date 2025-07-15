@@ -1,14 +1,19 @@
-const pool = require('../config/db');
+const mongoose = require('mongoose');
 
-exports.findUserByEmail = async (email) => {
-  const res = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-  return res.rows[0];
-};
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true
+  }
+});
 
-exports.createUser = async (email, hashedPassword) => {
-  const res = await pool.query(
-    'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id',
-    [email, hashedPassword]
-  );
-  return res.rows[0];
-};
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
